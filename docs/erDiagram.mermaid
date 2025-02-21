@@ -1,0 +1,178 @@
+erDiagram
+    USER ||--o{ USER_GROUP_MEMBERSHIP : belongs_to
+    USER_GROUP ||--o{ USER_GROUP_MEMBERSHIP : includes
+
+    PERMISSION ||--o{ RESOURCE_PERMISSION : assigned_to
+    RESOURCE ||--o{ RESOURCE_PERMISSION : has
+    USER ||--o{ ACCESS_LOG : logs
+    USER ||--o{ ACCESS_REQUEST : creates
+    RESOURCE ||--o{ RESOURCE_TAG : has
+    TAG ||--o{ RESOURCE_TAG : assigned_to
+    RESOURCE ||--o{ RESOURCE_HISTORY : has
+    RESOURCE ||--o{ ACCESS_LOG : logs
+    RESOURCE ||--o{ ACCESS_REQUEST : requested_for
+    RESOURCE ||--o{ RESOURCE_ASSOCIATION : associated_with
+    ACCESS_REQUEST ||--o{ APPROVAL : has
+    USER ||--o{ APPROVAL : approved_by
+
+    RESOURCE ||--o{ DEVICE : is_a
+    RESOURCE ||--o{ URL : is_a
+    RESOURCE ||--o{ APPLICATION : is_a
+    RESOURCE ||--o{ PASSWORD : is_a
+
+    RESOURCE_PERMISSION ||--|| RESOURCE_PERMISSION_GROUP : is_a
+    RESOURCE_PERMISSION ||--|| RESOURCE_PERMISSION_USER : is_a
+    USER ||--o{ RESOURCE_PERMISSION_USER : has
+    USER_GROUP ||--o{ RESOURCE_PERMISSION_GROUP : has
+
+    ACCESS_REQUEST ||--o{ REQUESTED_PERMISSION : requests
+    RESOURCE_PERMISSION ||--o{ REQUESTED_PERMISSION : requested_for
+    APPROVAL ||--o{ APPROVAL_PERMISSION : requires
+    RESOURCE_PERMISSION ||--o{ APPROVAL_PERMISSION : required_for
+
+    PERMISSION ||--o{ GROUP_PERMISSION : assigned_to
+    USER_GROUP ||--o{ GROUP_PERMISSION : has
+    USER ||--o{ GROUP_PERMISSION : has
+
+    USER {
+        int userId PK
+        string username
+        string email
+        string passwordHash
+        datetime createdAt
+    }
+
+    USER_GROUP {
+        int groupId PK
+        string groupName
+        int createdBy FK
+        datetime createdAt
+    }
+
+    USER_GROUP_MEMBERSHIP {
+        int userId FK
+        int groupId FK
+        datetime joinedAt
+    }
+
+    PERMISSION {
+        int permissionId PK
+        string permissionName
+    }
+
+    GROUP_PERMISSION {
+        int groupPermissionId PK
+        int groupId FK
+        int userId FK
+        int permissionId FK
+    }
+
+    RESOURCE_PERMISSION {
+        int resourcePermissionId PK
+        int resourceId FK
+        string subtype "USER | GROUP"
+        int permissionId FK
+    }
+
+    RESOURCE_PERMISSION_USER {
+        int resourcePermissionId PK
+        int userId FK
+    }
+
+    RESOURCE_PERMISSION_GROUP {
+        int resourcePermissionId PK
+        int groupId FK
+    }
+
+    RESOURCE {
+        int resourceId PK
+        string resourceType "PASSWORD | DEVICE | URL | APPLICATION"
+        string description
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TAG {
+        int tagId PK
+        string tagName
+    }
+
+    RESOURCE_TAG {
+        int resourceId FK
+        int tagId FK
+    }
+
+    RESOURCE_HISTORY {
+        int historyId PK
+        int resourceId FK
+        json data
+        boolean is_encrypted
+        datetime changedAt
+        datetime expiresAt
+    }
+
+    ACCESS_LOG {
+        int logId PK
+        int userId FK
+        int resourceId FK
+        datetime accessedAt
+    }
+
+    ACCESS_REQUEST {
+        int requestId PK
+        int userId FK
+        int resourceId FK
+        string requestType
+        string status
+        datetime requestedAt
+    }
+
+    REQUESTED_PERMISSION {
+        int requestedPermissionId PK
+        int requestId FK
+        int resourcePermissionId FK
+    }
+
+    APPROVAL {
+        int approvalId PK
+        int requestId FK
+        int approvedBy FK
+        datetime approvedAt
+    }
+
+    APPROVAL_PERMISSION {
+        int approvalPermissionId PK
+        int approvalId FK
+        int resourcePermissionId FK
+    }
+
+    RESOURCE_ASSOCIATION {
+        int associationId PK
+        int parentResourceId FK
+        int childResourceId FK
+    }
+
+    DEVICE {
+        int deviceId PK
+        int resourceId FK
+        string deviceName
+        string deviceType
+    }
+
+    URL {
+        int urlId PK
+        int resourceId FK
+        string url
+    }
+
+    APPLICATION {
+        int applicationId PK
+        int resourceId FK
+        string applicationName
+    }
+
+    PASSWORD {
+        int passwordId PK
+        int resourceId FK
+        string encryptedPassword
+    }
